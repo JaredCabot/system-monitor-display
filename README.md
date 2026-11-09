@@ -257,6 +257,13 @@ empty stand-in for it in `obj/`, which the compiler finds first.
 
 Faults are written to `systemmonitordisplay.log` beside the settings file.
 
+## Reporting a problem
+
+Open an [issue](https://github.com/JaredCabot/system-monitor-display/issues/new/choose)
+and choose **Bug report**. The form asks for the program, Windows and
+HWiNFO versions, and the output of `--diagnose`, which between them
+answer most questions about a problem.
+
 ## Changelog
 
 See [CHANGELOG.md](CHANGELOG.md).

@@ -1,0 +1,92 @@
+name: Bug report
+description: Something in System Monitor Display does not work as it should.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report this. The more of the details below you can give, the quicker the problem can be found.
+
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you saw, and what you expected to see instead.
+      placeholder: "The CPU temperature box shows -- although HWiNFO is running."
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: How to make it happen
+      description: The steps that lead to the problem, if you know them.
+      placeholder: |
+        1. Start HWiNFO64.
+        2. Start System Monitor Display.
+        3. ...
+
+  - type: input
+    id: version
+    attributes:
+      label: Program version
+      description: Shown at the foot of the General group in the settings window, or by `systemmonitordisplay.exe --version`.
+      placeholder: "1.2.0"
+    validations:
+      required: true
+
+  - type: input
+    id: windows
+    attributes:
+      label: Windows version
+      description: From Settings > System > About, for example "Windows 11 Pro 25H2".
+    validations:
+      required: true
+
+  - type: input
+    id: hwinfo
+    attributes:
+      label: HWiNFO64 version and edition
+      placeholder: "8.30, free"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: source
+    attributes:
+      label: How HWiNFO shares its readings
+      description: See "Setting up HWiNFO64" in the README.
+      options:
+        - Shared memory only
+        - HWiNFO Gadget only
+        - Both
+        - Not sure
+    validations:
+      required: true
+
+  - type: input
+    id: display
+    attributes:
+      label: Display
+      description: The secondary display's make and model, and the resolution Windows reports for it.
+      placeholder: "Lamptron HM049, 960 x 400"
+
+  - type: textarea
+    id: diagnose
+    attributes:
+      label: Output of --diagnose
+      description: Run `systemmonitordisplay.exe --diagnose` from a Command Prompt in the program's folder and paste what it prints.
+      render: text
+
+  - type: textarea
+    id: log
+    attributes:
+      label: Log
+      description: The contents of `systemmonitordisplay.log`, if there is one. The settings window's General group shows the folder it is in.
+      render: text
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else
+      description: Screenshots or photos of the display, your settings file (`systemmonitordisplay.json`), or anything else that might help.
