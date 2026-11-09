@@ -1,0 +1,23 @@
+# What the program writes beside itself
+systemmonitordisplay.log
+systemmonitordisplay.json
+presets/
+*.tmp
+
+# Builds: the exe goes to a Release, not into the repository
+*.exe
+*.obj
+*.res
+obj/
+systemmonitordisplay-linux
+*.bmp
+
+# Private working material, never published
+scratch/
+notes/
+tests/
+docs/manual/
+docs/design-spec.md
+design/
+legacy/
+fonts/
