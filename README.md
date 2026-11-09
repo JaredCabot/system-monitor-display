@@ -145,7 +145,9 @@ groups:
   Animation settings in place. **Default**, always first in the list, puts
   them back to how the program comes. To keep the current ones, type a
   name and click **Save** (or press Enter); **Delete** removes the preset
-  named in the box. Each preset is a small file in a `presets` folder
+  named in the box. When the window opens, the box shows the preset that
+  matches the Look and Animation settings in use, or stays empty if none
+  does. Each preset is a small file in a `presets` folder
   beside the settings file, so presets can be copied to another PC or
   shared.
 

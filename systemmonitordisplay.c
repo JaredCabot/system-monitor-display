@@ -47,7 +47,7 @@
 #include "font8x16.h"
 
 #define NAME "System Monitor Display"
-#define VERSION "1.2.0"
+#define VERSION "1.3.0"
 #define HOME_PAGE "https://github.com/JaredCabot/system-monitor-display"
 #define WIDE_(s) L##s
 #define WIDE(s) WIDE_(s)
@@ -2866,37 +2866,87 @@ static void preset_save(void)
     preset_list(name);
 }
 
-/* Only the preset's part is taken, whatever else the file holds. */
-static void preset_load(const wchar_t *name)
+/* The settings in use with the preset's part put in place; only that part
+   is taken, whatever else the file holds. 0 if the preset cannot be read. */
+static int preset_read(const wchar_t *name, Settings *s)
 {
     char file[260], *text;
     FILE *f;
-    Settings s = app.s, from = app.s;
+    Settings from = app.s;
     size_t first, end, i;
     if (!_wcsicmp(name, DEFAULT_PRESET))
         settings_defaults(&from);
     else {
         if (!preset_file(name, file, sizeof file) || !(f = open_beside(file, "rb")))
-            return;
+            return 0;
         text = read_all(f);
         fclose(f);
         if (!text)
-            return;
+            return 0;
         settings_parse(&from, text);
         free(text);
     }
+    *s = app.s;
     preset_part(&first, &end);
     for (i = first; i < end; i++) {
         const Field *fl = &FIELDS[i];
         size_t size = fl->type == T_STR ? fl->len : sizeof(double);
-        memcpy((char *)&s + fl->off, (char *)&from + fl->off, size);
+        memcpy((char *)s + fl->off, (char *)&from + fl->off, size);
     }
-    settings_tidy(&s);
+    settings_tidy(s);
+    return 1;
+}
+
+static void preset_load(const wchar_t *name)
+{
+    Settings s;
+    if (!preset_read(name, &s))
+        return;
     if (memcmp(&s, &app.s, sizeof s)) {
         app.s = s;
         save_and_apply();
     }
     gui_fill();
+}
+
+/* Whether the presets' parts match, numbers as a preset file holds them. */
+static int preset_same(const Settings *a, const Settings *b)
+{
+    size_t first, end, i;
+    preset_part(&first, &end);
+    for (i = first; i < end; i++) {
+        const Field *fl = &FIELDS[i];
+        const char *x = (const char *)a + fl->off, *y = (const char *)b + fl->off;
+        char p[32], q[32];
+        if (fl->type != T_STR) {
+            snprintf(p, sizeof p, "%.10g", *(const double *)x);
+            snprintf(q, sizeof q, "%.10g", *(const double *)y);
+            x = p;
+            y = q;
+        }
+        if (strcmp(x, y))
+            return 0;
+    }
+    return 1;
+}
+
+/* Shows the preset whose Look and Animation settings are the ones in use:
+   Default, else the first saved one that matches, else none. */
+static void preset_show_current(void)
+{
+    HWND c = GetDlgItem(gui.win, IDC_PRESET);
+    int i, n = (int)SendMessageW(c, CB_GETCOUNT, 0, 0);
+    wchar_t name[MAX_PATH];
+    Settings s;
+    for (i = 0; i < n; i++)
+        if (SendMessageW(c, CB_GETLBTEXTLEN, i, 0) < MAX_PATH) {
+            SendMessageW(c, CB_GETLBTEXT, i, (LPARAM)name);
+            if (preset_read(name, &s) && preset_same(&s, &app.s)) {
+                SendMessageW(c, CB_SETCURSEL, i, 0);
+                return;
+            }
+        }
+    SetWindowTextW(c, L"");
 }
 
 static void preset_delete(void)
@@ -2916,6 +2966,7 @@ static void preset_delete(void)
     beside(file, path, LONG_PATH);
     DeleteFileW(path);
     preset_list(L"");
+    preset_show_current();
 }
 
 /* Hidden rows typed beyond what the panel can hide, given the other box
@@ -2990,8 +3041,10 @@ static LRESULT CALLBACK settings_proc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
             DestroyWindow(hwnd);
         } else if (id == IDC_FOLDER && code == STN_CLICKED)
             ShellExecuteW(hwnd, L"open", data_folder(), NULL, NULL, SW_SHOWNORMAL);
-        else if (id == IDC_REVERT)
+        else if (id == IDC_REVERT) {
             revert();
+            preset_show_current();
+        }
         else if (id == IDC_COLOUR && code == BN_CLICKED)
             pick_colour();
         else if (id >= IDC_FIELD && id < IDC_FIELD + (int)NFIELDS
@@ -3302,6 +3355,7 @@ static int settings_create(void)
     gui.opened = app.s;
     gui.opened_startup = startup_on();
     preset_list(L"");
+    preset_show_current();
     gui_fill();
     revert_state();
     settings_status();

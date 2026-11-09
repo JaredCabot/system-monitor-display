@@ -6,6 +6,15 @@ The format follows [Keep a
 Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-11-10
+
+### Changed
+
+- **The preset in use is shown.** When the settings window opens, the
+  Presets box shows the preset that matches the current Look and
+  Animation settings, or stays empty if none does. Revert and Delete
+  update it too.
+
 ## [1.2.0] - 2026-11-10
 
 ### Added
