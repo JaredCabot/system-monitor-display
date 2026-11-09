@@ -34,9 +34,11 @@ display.
 
 Download `systemmonitordisplay.exe` from the [latest
 release](https://github.com/JaredCabot/system-monitor-display/releases/latest),
-put it in any folder you can write to and double-click it. It keeps its
-settings and log beside itself, so the folder can be anywhere and moved
-later.
+put it in any folder and double-click it. It keeps its settings, presets
+and log beside itself, so the folder can be anywhere and moved later. If
+Windows will not let it write in its own folder, as under `Program Files`,
+it keeps them in `%APPDATA%\System Monitor Display` instead. `--diagnose`
+shows which folder is in use.
 
 To start it with Windows, tick **Start with Windows** in the settings
 window. This puts a shortcut in your Startup folder pointing at the exe
@@ -46,6 +48,33 @@ the shortcut follows. Untick the box to remove the shortcut.
 HWiNFO needs **Auto Start** ticked in its own settings too. If the panel
 starts first it shows NO SIGNAL and picks the readings up once HWiNFO is
 running.
+
+### A black screen until the panel starts
+
+Windows shows the desktop on the display from the moment you sign in
+until the panel starts, which is about 10 seconds for a program in the
+Startup folder. To keep that time black, give the display a black
+wallpaper of its own. These steps are for Windows 11.
+
+1. Download [black-960x400.png](extras/black-960x400.png), also attached
+   to the latest release, and keep it somewhere it will stay, such as
+   your Pictures folder.
+2. To find the display's number, open **Settings > System > Display**
+   and click **Identify**.
+3. Open **Settings > Personalisation > Background**, set **Personalise
+   your background** to **Picture**, click **Browse photos** and choose
+   the black image. Windows puts it on every display for now.
+4. Under **Recent images**, right-click your usual wallpaper and choose
+   **Set for monitor 1** (or the number of your main display). Then
+   right-click the black image and choose **Set for monitor** with the
+   panel's display number.
+5. Open **Settings > Personalisation > Taskbar > Taskbar behaviours** and
+   untick **Show my taskbar on all displays**.
+6. If any desktop icons are on the display, drag them to your main one.
+
+A wallpaper for each display only works with **Picture** backgrounds;
+a slideshow or Windows Spotlight puts the same picture on every display.
+The sign-in screen itself cannot be changed this way.
 
 ## Setting up HWiNFO64
 
@@ -116,7 +145,8 @@ groups:
   them back to how the program comes. To keep the current ones, type a
   name and click **Save** (or press Enter); **Delete** removes the preset
   named in the box. Each preset is a small file in a `presets` folder
-  beside the program, so presets can be copied to another PC or shared.
+  beside the settings file, so presets can be copied to another PC or
+  shared.
 
 Each box has two alarm levels. At the first its border turns double; at
 the second its number, unit and bar also blink, on for half a second and
@@ -135,13 +165,14 @@ its decimal places, and always clear at least one step of it (1, 0.1 or
 
 ## Settings file
 
-`systemmonitordisplay.json` beside the program holds every setting. It is
-written with the defaults on first run, and half a second after a change
-in the settings window. It is written to a temporary file first and then
-swapped in, so a crash or power cut cannot leave it half-written. It can
-also be edited by hand; the panel applies a save within 2 seconds. A value
-that is missing, mistyped or out of range takes its default or the nearest
-allowed value.
+`systemmonitordisplay.json`, beside the program or in `%APPDATA%\System
+Monitor Display` (see Install), holds every setting. It is written with
+the defaults on first run, and half a second after a change in the
+settings window. It is written to a temporary file first and then swapped
+in, so a crash or power cut cannot leave it half-written. It can also be
+edited by hand; the panel applies a save within 2 seconds. A value that is
+missing, mistyped or out of range takes its default or the nearest allowed
+value.
 
 | Setting | Default (box 1, 2, 3) | What it does |
 |---|---|---|
@@ -219,10 +250,11 @@ empty stand-in for it in `obj/`, which the compiler finds first.
 | `systemmonitordisplay.c` | the program |
 | `font8x16.h` | Fixedsys Excelsior as 8 x 16 bitmaps |
 | `app.rc`, `app.manifest`, `app.ico` | the program icon (`>_` in the same font), and the manifest that gives the settings window today's Windows controls |
+| `extras/black-960x400.png` | a black wallpaper for the display; see Install |
 | `build.cmd`, `build.sh` | builds |
 | `docs/preview.png` | the picture at the top of this page |
 
-Faults are written to `systemmonitordisplay.log` beside the program.
+Faults are written to `systemmonitordisplay.log` beside the settings file.
 
 ## Changelog
 

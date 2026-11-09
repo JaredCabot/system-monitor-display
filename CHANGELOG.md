@@ -6,6 +6,20 @@ The format follows [Keep a
 Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-11-10
+
+### Added
+
+- **A black wallpaper for the display** (`extras/black-960x400.png`, also
+  attached to the release), and steps in the README for setting it on
+  that display only, so it stays black from sign-in until the panel
+  starts.
+- **Program Files and other read-only folders.** If the program cannot
+  write in its own folder, it keeps its settings, presets and log in
+  `%APPDATA%\System Monitor Display` instead of failing to save. In a
+  folder it can write to, nothing changes. `--diagnose` shows which
+  folder is in use.
+
 ## [1.0.0] - 2026-11-10
 
 The first release.

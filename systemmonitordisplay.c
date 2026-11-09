@@ -7,9 +7,10 @@
  *   systemmonitordisplay.exe --selftest
  *   systemmonitordisplay.exe --version
  *
- * Settings live in systemmonitordisplay.json beside the exe. It is written
- * with the defaults on first run and re-read whenever it is saved. Faults
- * go to systemmonitordisplay.log beside it.
+ * Settings live in systemmonitordisplay.json beside the exe, or in
+ * %APPDATA%\System Monitor Display if the exe's folder cannot be written
+ * to. It is written with the defaults on first run and re-read whenever
+ * it is saved. Faults go to systemmonitordisplay.log beside it.
  *
  * Build: build.cmd (MinGW-w64 or MSVC) or build.sh (MinGW-w64 on Linux).
  * It links only Windows' own libraries: user32, gdi32, shell32, advapi32,
@@ -46,7 +47,7 @@
 #include "font8x16.h"
 
 #define NAME "System Monitor Display"
-#define VERSION "1.0.0"
+#define VERSION "1.1.0"
 #define HOME_PAGE "https://github.com/JaredCabot/system-monitor-display"
 #define WIDE_(s) L##s
 #define WIDE(s) WIDE_(s)
@@ -95,31 +96,69 @@ static void *must_alloc(size_t bytes)
     return p;
 }
 
-/* Files beside the program, so copying the exe takes its settings along. */
+/* Files beside the program, so copying the exe takes its settings along;
+   or, if Windows will not let the program write in its own folder (under
+   Program Files, say), in %APPDATA%\System Monitor Display. */
 #ifdef _WIN32
 #define LONG_PATH 4096          /* room for folders deeper than Windows' usual 260 */
 
-/* name (UTF-8) in the program's folder. A path of 260 characters or more
-   is given the \\?\ form, which Windows needs to open it. */
-static void beside(const char *name, wchar_t *out, size_t len)
+/* path in the \\?\ form if it is 260 characters or more, which Windows
+   needs to open it. */
+static void long_form(const wchar_t *path, wchar_t *out, size_t len)
 {
-    wchar_t exe[LONG_PATH], *slash;
-    DWORD n = GetModuleFileNameW(NULL, exe, LONG_PATH);
+    out[0] = 0;
+    if (wcslen(path) >= MAX_PATH - 1 && wcsncmp(path, L"\\\\?\\", 4)) {
+        if (path[0] == L'\\' && path[1] == L'\\')            /* \\server\share */
+            wcscpy(out, L"\\\\?\\UNC"), wcsncat(out, path + 1, len - 9);
+        else
+            wcscpy(out, L"\\\\?\\"), wcsncat(out, path, len - 5);
+    } else
+        wcsncat(out, path, len - 1);
+}
+
+/* The folder the settings, presets and log go in, ending in \. Decided
+   once: the program's folder if a file can be made there, otherwise
+   %APPDATA%\System Monitor Display, made if need be. */
+static const wchar_t *data_folder(void)
+{
+    static wchar_t dir[LONG_PATH];
+    wchar_t exe[LONG_PATH], test[LONG_PATH], *slash;
+    HANDLE h;
+    DWORD n;
+    if (dir[0])
+        return dir;
+    n = GetModuleFileNameW(NULL, exe, LONG_PATH);
     if (n == 0 || n >= LONG_PATH)
         exe[0] = 0;
     slash = wcsrchr(exe, L'\\');
     if (slash)
         slash[1] = 0;
-    out[0] = 0;
-    if (wcslen(exe) + strlen(name) >= MAX_PATH - 1 && wcsncmp(exe, L"\\\\?\\", 4)) {
-        if (exe[0] == L'\\' && exe[1] == L'\\')              /* \\server\share */
-            wcscpy(out, L"\\\\?\\UNC"), wcsncat(out, exe + 1, len - 9);
-        else
-            wcscpy(out, L"\\\\?\\"), wcsncat(out, exe, len - 5);
-    } else
-        wcsncat(out, exe, len - 1);
-    MultiByteToWideChar(CP_UTF8, 0, name, -1, out + wcslen(out),
-                        (int)(len - wcslen(out)));
+    wcscpy(dir, exe);
+    _snwprintf(test, LONG_PATH, L"%ls%ls", exe, L"" SLUG L".write-test");
+    test[LONG_PATH - 1] = 0;
+    long_form(test, exe, LONG_PATH);       /* exe: reused for the test's long form */
+    h = CreateFileW(exe, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS,
+                    FILE_ATTRIBUTE_TEMPORARY | FILE_FLAG_DELETE_ON_CLOSE, NULL);
+    if (h != INVALID_HANDLE_VALUE)
+        CloseHandle(h);                     /* writable: gone again on closing */
+    else if (SUCCEEDED(SHGetFolderPathW(NULL, CSIDL_APPDATA | CSIDL_FLAG_CREATE, NULL, 0,
+                                        exe))) {
+        _snwprintf(dir, LONG_PATH, L"%ls\\%ls\\", exe, L"" NAME);
+        dir[LONG_PATH - 1] = 0;
+        long_form(dir, test, LONG_PATH);
+        CreateDirectoryW(test, NULL);
+    }
+    return dir;
+}
+
+/* name (UTF-8) in the data folder, in the long form if need be. */
+static void beside(const char *name, wchar_t *out, size_t len)
+{
+    wchar_t path[LONG_PATH];
+    size_t k = wcslen(data_folder());
+    wcscpy(path, data_folder());
+    MultiByteToWideChar(CP_UTF8, 0, name, -1, path + k, (int)(LONG_PATH - k));
+    long_form(path, out, len);
 }
 
 static FILE *open_beside(const char *name, const char *mode)
@@ -3441,6 +3480,7 @@ static int diagnose(void)
         printf("  (%ld, %ld, %ld, %ld)%s\n", m.r[i].left, m.r[i].top, width, height,
                width == W && height == H ? "   <- the panel's screen" : "");
     }
+    printf("\nSettings, presets and log:\n  %ls\n", data_folder());
     settings_load(&s, SLUG ".json");
     for (r = 0; r < 2; r++) {
         uint64_t stamp;
