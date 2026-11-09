@@ -20,8 +20,8 @@ card as an ordinary monitor, which reports 960 x 400 to Windows and shows
 960 x 320 of it. It finds that screen by its resolution; on a PC without
 one it opens as an ordinary window, so it can be tried out anywhere.
 
-The picture above is a render from `--preview`, not a photograph of the
-display.
+The picture above is a render from `--preview`, cropped to the 320 rows
+the display shows, not a photograph of it.
 
 ## Requirements
 
