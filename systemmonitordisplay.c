@@ -47,7 +47,7 @@
 #include "font8x16.h"
 
 #define NAME "System Monitor Display"
-#define VERSION "1.1.0"
+#define VERSION "1.2.0"
 #define HOME_PAGE "https://github.com/JaredCabot/system-monitor-display"
 #define WIDE_(s) L##s
 #define WIDE(s) WIDE_(s)
@@ -2361,7 +2361,7 @@ static void startup_follow(void)
 
 #define IDC_FIELD 100               /* a setting's control: IDC_FIELD + field */
 enum { IDC_PHOSPHOR = 90, IDC_COLOUR, IDC_CLOSE, IDC_STARTUP, IDC_REVERT, IDC_PRESET,
-       IDC_PRESET_SAVE, IDC_PRESET_DELETE, IDC_LINK };
+       IDC_PRESET_SAVE, IDC_PRESET_DELETE, IDC_LINK, IDC_FOLDER };
 #define WM_APPLY (WM_APP + 2)
 enum { K_EDIT, K_CHECK, K_COMBO, K_LIST, K_SLIDER };
 
@@ -2988,7 +2988,9 @@ static LRESULT CALLBACK settings_proc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
         else if (id == IDCANCEL) {                /* Cancel, or Esc */
             revert();
             DestroyWindow(hwnd);
-        } else if (id == IDC_REVERT)
+        } else if (id == IDC_FOLDER && code == STN_CLICKED)
+            ShellExecuteW(hwnd, L"open", data_folder(), NULL, NULL, SW_SHOWNORMAL);
+        else if (id == IDC_REVERT)
             revert();
         else if (id == IDC_COLOUR && code == BN_CLICKED)
             pick_colour();
@@ -3215,6 +3217,20 @@ static void settings_build(void)
              IDC_STARTUP);
     tip(c, L"Starts the panel when you sign in to Windows, from wherever this program is. "
            L"Move the program and it follows the next time it starts");
+    {   /* where the settings, presets and log are; long paths lose their middle */
+        wchar_t folder[LONG_PATH], text[LONG_PATH + 64];
+        size_t k;
+        wcscpy(folder, data_folder());
+        k = wcslen(folder);
+        if (k > 3 && folder[k - 1] == L'\\')
+            folder[k - 1] = 0;
+        label(L"Settings, presets and log are in:", 678, 492, 300);
+        c = make(L"STATIC", folder, SS_LEFT | SS_PATHELLIPSIS | SS_NOTIFY, 0, 678, 517, 300, 20,
+                 IDC_FOLDER);
+        _snwprintf(text, LONG_PATH + 64, L"%ls\nClick to open the folder in Explorer", folder);
+        text[LONG_PATH + 63] = 0;
+        tip(c, text);
+    }
     label(L"" NAME L" " VERSION_W, 678, 552, 300);
     label(L"\u00A9 2026 Jared Cabot. MIT licence.", 678, 574, 300);
     c = make(L"SysLink", L"<a>github.com/JaredCabot/system-monitor-display</a>", WS_TABSTOP, 0,

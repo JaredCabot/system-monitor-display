@@ -137,8 +137,9 @@ groups:
 - **General**: rows the display hides at the top and bottom (if the two
   come to more than the panel can hide, the one you typed drops to the
   most it can take), smoothing, how long without a reading before a box
-  shows `--`, and **Start with Windows**. Below them are the version and a
-  link to this page.
+  shows `--`, and **Start with Windows**. Below them are the folder the
+  settings, presets and log are kept in (click it to open it in
+  Explorer), the version and a link to this page.
 - **Header**: one or two lines of your own text above the boxes.
 - **Presets**: saved looks. Pick a name from the list to put its Look and
   Animation settings in place. **Default**, always first in the list, puts

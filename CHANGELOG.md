@@ -6,6 +6,15 @@ The format follows [Keep a
 Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-11-10
+
+### Added
+
+- **Where the files are.** The settings window's General group shows the
+  folder the settings, presets and log are kept in, beside the program or
+  in `%APPDATA%\System Monitor Display`. Clicking it opens the folder in
+  Explorer.
+
 ## [1.1.0] - 2026-11-10
 
 ### Added
