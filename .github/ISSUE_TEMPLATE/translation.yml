@@ -1,0 +1,61 @@
+name: Translation error
+description: A word or sentence in the settings window or tray menu is wrong, unclear or does not fit.
+labels: ["translation"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping the translations read well. Each language is a file in the `lang` folder of this repository, with a glossary of the words it uses for the program's main terms.
+
+  - type: dropdown
+    id: language
+    attributes:
+      label: Language
+      options:
+        - Deutsch (German)
+        - Español (Spanish)
+        - Français (French)
+        - Italiano (Italian)
+        - Русский (Russian)
+        - 日本語 (Japanese)
+        - 简体中文 (Simplified Chinese)
+        - English
+    validations:
+      required: true
+
+  - type: input
+    id: where
+    attributes:
+      label: Where it appears
+      description: The group, label, button, tooltip, message or menu.
+      placeholder: "Animation group, the tooltip on the hum bar speed"
+    validations:
+      required: true
+
+  - type: textarea
+    id: now
+    attributes:
+      label: What it says now
+      description: Copy the text as it appears, or attach a screenshot.
+    validations:
+      required: true
+
+  - type: textarea
+    id: better
+    attributes:
+      label: What it should say
+    validations:
+      required: true
+
+  - type: textarea
+    id: why
+    attributes:
+      label: Why
+      description: Wrong meaning, a typo, an unnatural phrase, a word that differs from the rest of the window, text that is cut off, and so on.
+
+  - type: input
+    id: version
+    attributes:
+      label: Program version
+      description: Shown at the foot of the General group in the settings window.
+      placeholder: "1.4.0"

@@ -2,3 +2,13 @@
    Common Controls 6 for the settings window. */
 1 ICON "app.ico"
 1 24 "app.manifest"
+
+/* The language catalogues: IDR_LANG (200) + the index in LANGS[]. */
+200 RCDATA "lang/en.json"
+201 RCDATA "lang/de.json"
+202 RCDATA "lang/es.json"
+203 RCDATA "lang/fr.json"
+204 RCDATA "lang/it.json"
+205 RCDATA "lang/ru.json"
+206 RCDATA "lang/ja.json"
+207 RCDATA "lang/zh-Hans.json"
