@@ -1,7 +1,7 @@
 # System Monitor Display
 
 <p align="center">
-  <img src="docs/preview.png" alt="The panel showing CPU load 47 %, CPU temperature 61 °C and GPU load 82 %" width="960">
+  <img src="docs/preview.webp" alt="The panel showing CPU load, CPU temperature and GPU load as the readings change, with the hum bar and a ripple rolling up the screen" width="960">
 </p>
 
 A full-screen sensor panel for a small secondary monitor, drawn as an old
@@ -20,8 +20,11 @@ card as an ordinary monitor, which reports 960 x 400 to Windows and shows
 960 x 320 of it. It finds that screen by its resolution; on a PC without
 one it opens as an ordinary window, so it can be tried out anywhere.
 
-The picture above is a render from `--preview`, cropped to the 320 rows
-the display shows, not a photograph of it.
+The picture above is a 10-second loop drawn by the program's own code,
+cropped to the 320 rows the display shows, not a recording of it. It uses
+the default look with the readings moving and quicker timings than the
+defaults: a hum bar every 10 s instead of 16.7 s, and a ripple that
+crosses in 6 s instead of 23.3 s.
 
 ## Requirements
 
@@ -313,7 +316,7 @@ empty stand-in for it in `obj/`, which the compiler finds first.
 | `lang/` | the languages (`<tag>.json`), their glossaries, and `sync_english.py`, which writes `en.json` from the code |
 | `extras/black-960x400.png` | a black wallpaper for the display; see Install |
 | `build.cmd`, `build.sh` | builds |
-| `docs/preview.png` | the picture at the top of this page |
+| `docs/preview.webp` | the picture at the top of this page |
 
 Faults are written to `systemmonitordisplay.log` beside the settings file.
 
